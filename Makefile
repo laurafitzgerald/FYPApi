@@ -14,3 +14,6 @@ build:
 
 release: build
 	docker login -e laurafitzgeraldsemail@gmail.com -u laura -p $(PASS)  docker-laura.ammeon.com:80 && docker tag -f fyp/api docker-laura.ammeon.com:80/fyp/api && docker push docker-laura.ammeon.com:80/fyp/api
+
+run local: build
+	docker run -p 80:9292 fyp/api
