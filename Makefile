@@ -17,3 +17,7 @@ release: build
 
 run local: build
 	docker run -p 80:9292 fyp/api
+
+releasedemo:
+	docker login -u laurafitz
+	docker build -t laurafitz/fypapi:$(shell git rev-parse --short HEAD) . && docker push laurafitz/fypapi:$(shell git rev-parse --short HEAD)
