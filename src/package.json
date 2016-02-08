@@ -2,10 +2,11 @@
   "name": "bike-api",
   "private": true,
   "version": "0.0.1",
-  "description": "Node.js Hello world app on CentOS using docker",
-  "author": "Daniel Gasienica <daniel@gasienica.ch>",
+  "description": "",
+  "author": "Laura Fitzgerald",
   "dependencies": {
     "express": "~4.0.0",
+    "mongoose": "~3.6.13",
     "body-parser" : "~1.0.1"
   }
 }

@@ -1,0 +1,21 @@
+User
+
+
+
+Bike
+
+{"nickname": "", "make": "", "model": ""}
+
+Friendship
+
+
+{"user_id": "", "friend_id": "", "start_date", "", "status": "REQUEST"}
+
+Activity
+{"name": "", "distance": , "speed": , "type": ""}
+
+
+
+
+
+
