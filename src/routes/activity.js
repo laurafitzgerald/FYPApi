@@ -32,10 +32,14 @@ router.findActivityByUser = function(req, res){
 				});
 			}else{
 					res.json("message", "no activities found for user");
+					//need better responses here
+					//respond with empty list here
+					//Should be a valid return for all error checking
 			}
 		}else{
 
 			res.json("message", "not a valid user");
+			//if an error - return 501 etc.
 
 		}
 	});
@@ -54,17 +58,25 @@ router.createActivityByUser = function(req,res){
 
 			console.log('getting user id');
 			var userid = req.query.id;
+			console.log(userid);
 			User.findById(userid, function(err, user){
 				console.log('found user');
-				user.activities.push(activity.id);
-				user.save(function(err){
+				if(user){
 
-					if(err)
-						res.send(err);
-					res.json(activity);
+
+					user.activities.push(activity.id);
+					user.save(function(err){
+
+						if(err)
+							res.send(err);
+						res.json(activity);
 
 				})
 
+				}else{
+
+					res.json({"message": "not a valid user"});
+				}
 
 			})
 
@@ -73,7 +85,7 @@ router.createActivityByUser = function(req,res){
 
 };
 
-
+//will need to get rid of this 
 router.findAllActivities = function(req, res){
 
 

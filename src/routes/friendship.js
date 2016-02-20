@@ -31,7 +31,7 @@ router.findAllFriendships = function(req, res){
 			res.json(friendships)
 		else
 			res.json({"message": "no friendships"});
-	})
+	});
 
 
 };

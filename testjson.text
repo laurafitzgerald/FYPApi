@@ -1,6 +1,6 @@
 User
 
-
+{"email": "", "name": "","password": "","location": ""}
 
 Bike
 
@@ -15,6 +15,11 @@ Activity
 {"name": "", "distance": , "speed": , "type": ""}
 
 
+
+
+
+
+"": "",
 
 
 

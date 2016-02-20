@@ -18,6 +18,7 @@ var usersroute = require('./routes/user');
 var bikesroute = require('./routes/bike');
 var friendshipsroute = require('./routes/friendship');
 var activitiesroute = require('./routes/activity');
+var reportsroute = require('./routes/report');
 
 router.use(function(req, res, next){
 
@@ -30,7 +31,9 @@ app.use(cors());
 
 app.get('/users', usersroute.findAll);
 app.post('/users', usersroute.create);
-
+app.get('/users/:id', usersroute.findUser);
+app.delete('/users/:id', usersroute.deleteUser);
+app.put('/users/:id', usersroute.updateUser);
 ///////////////////////////
 ///////////////////////Bike REST API
 
@@ -51,8 +54,15 @@ app.post('/activities', activitiesroute.createActivityByUser);
 app.get('/activities', activitiesroute.findAllActivities);
 app.get('/activities/:id', activitiesroute.findActivityByUser);
 
+
+
+/////////////////////////
+///////////////////Report REST API
+app.get('/reports', reportsroute.findAllReports);
+app.post('/reports', reportsroute.createReport);
+
 router.get('/', function (req, res) {
-  res.send('Hello world\n');
+  res.json({"message" : "Hello world"});
 });
 
 ///cors middleware
