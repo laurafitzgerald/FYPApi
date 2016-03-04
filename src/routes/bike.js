@@ -5,6 +5,13 @@ var Bike = require('../models/bike');
 var User = require('../models/user');
 var lupus = require('lupus');
 
+
+
+var nats = require('nats');
+var servers = ['nats://nats.default:4222'];
+var nc = nats.connect({'servers': servers});
+console.log("Connected to " + nc.currentServer);
+
 router.editBike = function(req,res){
 
 	var bike = new Bike();
@@ -24,6 +31,17 @@ router.editBike = function(req,res){
 }
 
 router.findBikeByUser = function(req, res){
+	
+
+	var msg = req.params.id;
+
+	nc.request('bike.read.byuser', msg, function(response){
+		console.log("got a respons in msg stream : " + response);
+		res.send(JSON.stringify(response));
+
+	})
+
+	/*
 	var bikes = [];
 	var userid = req.query.id;
 	console.log(userid);
@@ -54,12 +72,23 @@ router.findBikeByUser = function(req, res){
 
 		}
 	});
+*/
 
 };
 
 
 router.createBikeByUser = function(req,res){
 
+		console.log("trying to create a bike");
+		var json = JSON.stringify(req.body)
+		nc.request('bike.create', json, function(response){
+
+			console.log("got a response in msg stream: " + response);
+				res.send({"message": "bike added"});
+		});
+
+
+	/*
 	console.log("creating bike");
 	var bike = new Bike();
 	bike.nickname = req.body.nickname;
@@ -91,6 +120,7 @@ router.createBikeByUser = function(req,res){
 			});
 
 		});
+*/
 
 
 };

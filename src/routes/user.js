@@ -3,6 +3,16 @@ var express = require('express');
 var Bike = require('../models/bike');
 var router = express.Router();
 
+var nats = require('nats');
+var servers = ['nats://nats.default:4222'];
+var nc = nats.connect({'servers': servers});
+console.log("Connected to " + nc.currentServer);
+
+//////////////////////////////////////
+//HTTP responses
+//400 Bad Request
+//https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
+
 /*
 var testBike = new Bike('1', 'wheels', 'giant', 'avail');
 var bikes = [];
@@ -14,65 +24,48 @@ var users = [testuser];*/
 ////////////////////////////////
 ///////////////////User REST API
 
-router.findAll  = function(req, res){
-		//request for data from db goes here
-		//res.json(users);
-		User.find(function(err, users){
-			if(err)
-				res.send(err);
-			res.json(users);
+router.findAll  = function(req, res){	
+		nc.request('user.read.all', function(response){
+			console.log("got a response from user.read.all");
 
+				res.send(response);
 		});
-
 	};
 
 router.findUser = function(req, res){
-		User.findOne({_id: req.params.id}, function(err, user){
-
-			if(err)	
-				res.status(404)
-				   .send('Not found');
-			res.json(user);
-
-		})
-
-
-
+	nc.request('user.read.one', req.params.username, function(response, reply){
+		if(response)
+			res.send(response);
+		res.send(400);
+	});
 }
+
 router.create = function(req, res){
-
-
-		console.log("creating user");
-		var user = new User();
-		user.email = req.body.email;
-		user.name = req.body.name;
-		user.password = req.body.password;
-		user.location = req.body.location;
-		user.bikes = [];
-		user.activities = [];
-	
-
-		user.save(function(err){
-			if(err){
-				res.send(400);
+	//any domain specific validation happens in the specific service 
+		nc.request('user.create', JSON.stringify(req.body), function(response){
+			if(response){
+				res.send(200);
 			}
-			res.json(user);
-
-		})
-
-	
-
-	
+			res.send(400);			
+		});
 }
 router.deleteUser = function(req, res){
 
 	console.log("deleting a user")
+	nc.request('user.delete', req.params.username, function(response, reply){
+		if(response){
+			res.send(200);
+		}
+		res.send(400);
+
+	});
+	/*
 	User.remove({_id: req.params.id}, function(err){
 		if(err)
 			res.send(err);
 		res.json({"message": "user removed"});
 
-	})
+	})*/
 
 }
 

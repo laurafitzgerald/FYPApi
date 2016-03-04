@@ -31,8 +31,8 @@ app.use(cors());
 
 app.get('/users', usersroute.findAll);
 app.post('/users', usersroute.create);
-app.get('/users/:id', usersroute.findUser);
-app.delete('/users/:id', usersroute.deleteUser);
+app.get('/users/:username', usersroute.findUser);
+app.delete('/users/:username', usersroute.deleteUser);
 app.put('/users/:id', usersroute.updateUser);
 ///////////////////////////
 ///////////////////////Bike REST API

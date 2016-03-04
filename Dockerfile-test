@@ -1,0 +1,7 @@
+FROM node
+
+ADD src /api
+RUN cd /api; npm install
+
+WORKDIR /api/apitest
+ENTRYPOINT ['/api/node_modules/mocha/bin/mocha']

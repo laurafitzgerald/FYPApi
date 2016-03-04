@@ -15,6 +15,7 @@ var UserSchema = new Schema({
 module.exports = mongoose.model('User', UserSchema);
 
 
+
 /*function User(username_in, email_in, password_in, location_in, bikes){
 	
 	this.email = email_in;

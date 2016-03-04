@@ -7,6 +7,13 @@ var Activity = require('../models/activity');
 var lupus = require('lupus');
 
 
+
+
+var nats = require('nats');
+var servers = ['nats://nats.default:4222'];
+var nc = nats.connect({'servers': servers});
+console.log("Connected to " + nc.currentServer);
+
 router.findActivityByUser = function(req, res){
 	var activities = [];
 	var userid = req.query.id;
@@ -48,6 +55,19 @@ router.findActivityByUser = function(req, res){
 
 router.createActivityByUser = function(req,res){
 
+		var d = new Date();
+		var currentdate = d.toLocaleString();
+		console.log("Current Date: "+ currentdate);
+		
+
+		var json = JSON.stringify(req.body)
+		nc.request('bike.create', json, function(response){
+
+			console.log("got a response in msg stream: " + response);
+				res.send({"message": "bike added"});
+		});
+
+/*
 	console.log("creating activity");
 	var activity = new Activity();
 	activity.name = req.body.name;
@@ -82,7 +102,7 @@ router.createActivityByUser = function(req,res){
 
 		})
 
-
+*/
 };
 
 //will need to get rid of this 
