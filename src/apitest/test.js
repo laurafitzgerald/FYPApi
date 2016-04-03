@@ -3,23 +3,16 @@ var assert = require('assert');
 
 var supertest = require("supertest");
 var should = require("should");
-
-
 //test case
-
 //This agent refers to PORT where program is running
-
 var server = supertest.agent("http://localhost:8000");
 var url = "http://localhost:8000";
 
 //UNIT test begin
 
 describe("Sample unit test", function(done){
-
 	//#1 it should return home page
 	it("should return home page", function(done){
-
-
 		server
 		.get("/")
 		.expect("Content-type",/json/)
@@ -32,21 +25,16 @@ describe("Sample unit test", function(done){
 			done();
 		});
 	});
-
 });
-
 
 describe("User", function(){
 	it('should return error trying to save duplicate email', function(done){
 		var user = {
 			email: 'laurafitz@gmail.com',
-			name: 'Laura',
+			username: 'Laura',
 			password: 'pass',
 			location: 'waterford'
-
-
 		};
-
 		supertest(url)
 		.post('/users')
 		.send(user)
@@ -60,12 +48,10 @@ describe("User", function(){
 
 		});
 	});
+
 	it('should correctly update an existing account', function(done){
-
-		var body = {email: 'lisafitz@gmail.com', name: 'Lisa Fitz',
+		var body = {email: 'lisafitz@gmail.com', username: 'Lisa Fitz',
 					location: 'Tramore', password: 'pass'};
-
-
 		supertest(url)
 				.put('/users/56b9f14c1cec89ec13000001')
 				.send(body)
@@ -79,9 +65,7 @@ describe("User", function(){
 					//res.body.location.should.equal('Tramore');
 					res.body.creationDate.should.not.equal(null);
 					done();
-				});
+		});
 	});
-
-
 });
 //access the home page

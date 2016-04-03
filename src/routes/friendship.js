@@ -6,21 +6,103 @@ var User = require('../models/user');
 var lupus = require('lupus');
 
 
+var nats = require('nats');
+var servers = ['nats://nats.default:4222'];
+var nc = nats.connect({'servers': servers});
+console.log("Connected to " + nc.currentServer);
+
+var authenticate = require('../utility');
+
+router.findFriendsBySearch = function(req, res){
+
+
+	var sessionkey = req.get("XAuth");
+		console.log("Session key : " + sessionkey);
+
+		authenticate.validateSession(sessionkey,
+			function(username){
+				var obj = req.params;
+				if(obj.hasOwnProperty('username')){
+					var query = "Lau";
+					var paramquery = req.params.searcName;
+					nc.request('friendship.find.by.username',  JSON.stringify(query) , function(response){
+						console.log("searching by username");
+						if(response.length==0)
+							res.send(400);
+						else
+							res.send(response);
+
+
+					});
+				}
+				if(obj.hasOwnProperty('location')){
+
+
+					console.log("searching by location - needs to be written");
+					res.send(404);
+
+				}
+
+
+			},
+			function(){
+				res.send(401);
+			});
+
+
+
+
+}
+
 router.findFriendShipsByUser = function(req, res){
-	var userid = req.query.id;
-	var users = Friend.findAll({user_id:userid}, function(err,user){
+	
+		var sessionkey = req.get("XAuth");
+		console.log("Session key : " + sessionkey);
 
-		if(users.length>0){
+		authenticate.validateSession(sessionkey,
+			function(username){
+				console.log(req.query);
+				var obj = req.query;
+		
+				
+				if(obj.hasOwnProperty('username')){
+					var query = {};
+					query.username = "Lau";
+					
+					console.log("searching by username");
+					nc.request('friendship.find.by.username',  JSON.stringify(query) , function(response){
+						
+						if(response.length==0)
+							res.send(400);
+						else
+							res.send(response);
 
-			res.json(users);
 
-		}else{
-			res.json({"message": "no friendships found"});
-		}
-	});
+					});
+				}
+				else if(obj.hasOwnProperty('location')){
+
+
+					console.log("searching by location - needs to be written");
+					res.send(404);
+
+				}
+
+
+				else{
+
+					nc.request('friendship.read.by.user', username, function(response){
+						res.send(response);
+					});
+				}	
+			},
+			function(){
+				res.send(401);
+			});
 
 };
 
+/*
 router.findAllFriendships = function(req, res){
 
 
@@ -35,25 +117,32 @@ router.findAllFriendships = function(req, res){
 
 
 };
-
+*/
 router.createFriendship = function(req, res){
 
-	console.log("creating friendship");
-	var friendship = new Friendship();
-	friendship.user_id = req.body.user_id;
-	friendship.friend_id = req.body.friend_id;
-	friendship._status = "REQUEST";
+	var sessionkey = req.get("XAuth");
+	console.log("Session key : " + sessionkey);
 
-	friendship.save(function(err){
-		if(err)
-			res.send(err)
+	authenticate.validateSession(sessionkey,
+		function(username){
+			console.log("creating friendship");
+			var obj = req.body;
+			obj.user_name= req.body.user_name;
+			obj.friend_name = req.body.friend_name;
+			var d = new Date();
+			var currentdate = d.toLocaleString();
+			obj.timestamp = currentdate;
 
-		res.json(friendship);
-		
+			nc.request('friendship.create', JSON.stringify(obj), function(response){
+				if(response)
+					res.send(200);
+				res.send(400);
 
-	});
-
-
+			});
+		},
+		function(){
+			res.send(401);
+		});
 
 }
 

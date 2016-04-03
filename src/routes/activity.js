@@ -1,110 +1,86 @@
 
 var express = require('express');
 var router = express.Router;
-var Activities = require('../models/activity');
-var User = require('../models/user');
-var Activity = require('../models/activity');
-var lupus = require('lupus');
-
-
-
 
 var nats = require('nats');
 var servers = ['nats://nats.default:4222'];
 var nc = nats.connect({'servers': servers});
 console.log("Connected to " + nc.currentServer);
 
-router.findActivityByUser = function(req, res){
-	var activities = [];
-	var userid = req.query.id;
-	console.log(userid);
-	var user = User.findById(userid, function(err,user){
+var authenticate = require('../utility');
 
-		if(user){
-			console.log('found user');
-			var activityrefs = user.activities;
-			console.log(user.bikes);
-			if (activityrefs.length > 0){
-				lupus(0, activityrefs.length, function(n){
 
-					var activity = Activity.findById(activitiesrefs(n), function(err, activity){
-					if (err)
-						res.send(err);
-					activities.push(activity);
-					}, function(){
-					
-							res.json(activities);
-						
-					});
-				});
-			}else{
-					res.json("message", "no activities found for user");
-					//need better responses here
-					//respond with empty list here
-					//Should be a valid return for all error checking
-			}
-		}else{
 
-			res.json("message", "not a valid user");
-			//if an error - return 501 etc.
+router.deleteActivity = function(req, res){
 
-		}
-	});
+
+	var sessionkey = req.get("XAuth");
+
+	authenticate.validateSession(sessionkey,
+		function(username){
+			
+			nc.request('activity.delete', JSON.stringify(req.params.id), function(response){
+
+				if(!response)
+					res.send(400);
+				else
+					res.send(response);
+
+			});
+		},
+		function(){
+			res.send(401);
+		});
+
+
+};
+
+
+
+router.findActivitiesByUser = function(req, res){
+
+	var sessionkey = req.get("XAuth");
+
+	authenticate.validateSession(sessionkey,
+		function(username){
+			nc.request('activity.read.byuser', username, function(response){
+				res.send(response);
+			});
+		},
+		function(){
+			res.send(401);	
+		});
+
 
 };
 
 router.createActivityByUser = function(req,res){
-
-		var d = new Date();
-		var currentdate = d.toLocaleString();
-		console.log("Current Date: "+ currentdate);
 		
+		var sessionkey = req.get("XAuth");
+		console.log("Session key : " + sessionkey);
 
-		var json = JSON.stringify(req.body)
-		nc.request('bike.create', json, function(response){
-
-			console.log("got a response in msg stream: " + response);
-				res.send({"message": "bike added"});
-		});
-
-/*
-	console.log("creating activity");
-	var activity = new Activity();
-	activity.name = req.body.name;
-	activity.distance = req.body.distance;
-	activity.speed = req.body.speed;
-	activity.type = req.body.type;
-	activity.save(function(err){
-
-			console.log('getting user id');
-			var userid = req.query.id;
-			console.log(userid);
-			User.findById(userid, function(err, user){
-				console.log('found user');
-				if(user){
-
-
-					user.activities.push(activity.id);
-					user.save(function(err){
-
-						if(err)
-							res.send(err);
-						res.json(activity);
-
+		authenticate.validateSession(sessionkey,
+			function(username){
+				nc.request('user.read.one', req.body.username, function(response){
+					console.log(typeof response);
+					console.log(response);
+					if(response=="")	
+						res.send(400);
 				})
 
-				}else{
+				nc.request('activity.create', JSON.stringify(req.body), function(response){
+					if(response)
+						res.send(200);
+					res.send(400);
+				});
 
-					res.json({"message": "not a valid user"});
-				}
+			},
+			function(){
+				res.send(401);
+			});
 
-			})
-
-		})
-
-*/
 };
-
+/*
 //will need to get rid of this 
 router.findAllActivities = function(req, res){
 
@@ -120,6 +96,6 @@ router.findAllActivities = function(req, res){
 
 
 };
-
+*/
 
 module.exports = router;

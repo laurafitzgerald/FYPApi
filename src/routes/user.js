@@ -1,6 +1,6 @@
-var User = require('../models/user');
+//var User = require('../models/user');
 var express = require('express');
-var Bike = require('../models/bike');
+//var Bike = require('../models/bike');
 var router = express.Router();
 
 var nats = require('nats');
@@ -36,7 +36,8 @@ router.findUser = function(req, res){
 	nc.request('user.read.one', req.params.username, function(response, reply){
 		if(response)
 			res.send(response);
-		res.send(400);
+		else
+			res.send(400);
 	});
 }
 
@@ -68,6 +69,7 @@ router.deleteUser = function(req, res){
 	})*/
 
 }
+
 
 router.updateUser = function(req, res){
 

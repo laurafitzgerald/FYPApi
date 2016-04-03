@@ -12,120 +12,87 @@ var servers = ['nats://nats.default:4222'];
 var nc = nats.connect({'servers': servers});
 console.log("Connected to " + nc.currentServer);
 
+var authenticate = require('../utility');
+
+
 router.editBike = function(req,res){
 
-	var bike = new Bike();
-	bike.nickname = req.body.nickname;
-	bike.make = req.body.make;
-	bike.model = req.body.model;
+	var sessionkey = req.get("XAuth");
+	console.log("Session key : " + sessionkey);
+	authenticate.validateSession(sessionkey,
+		function(username){
 
-	var id = req.query.id;
+			var bike = new Bike();
+			bike.nickname = req.body.nickname;
+			bike.make = req.body.make;
+			bike.model = req.body.model;
 
-	Bike.findOneAndUpdate({_id: id}, {$set: {"nickname": bike.nickname, "make": bike.make, "model": bike.model}}, {upsert: true}, function(err, bike){
-		if(err) return res.send(500, {error: err});
-		res.send(bike);
+			var id = req.query.id;
 
-	});
+			Bike.findOneAndUpdate({_id: id}, {$set: {"nickname": bike.nickname, "make": bike.make, "model": bike.model}}, {upsert: true}, function(err, bike){
+				if(err) return res.send(500, {error: err});
+				res.send(bike);
+
+			});
+		},
+		function(){
+			res.send(401);
+		});
+			
 
 
 }
 
 router.findBikeByUser = function(req, res){
 	
+	var sessionkey = req.get("XAuth");
+	console.log("Session key : " + sessionkey);
+	authenticate.validateSession(sessionkey,
+		function(username){
+			nc.request('bike.read.by.user', username, function(response){
+				console.log("got a respons in msg stream : " + response);
+				res.send(response);
 
-	var msg = req.params.id;
-
-	nc.request('bike.read.byuser', msg, function(response){
-		console.log("got a respons in msg stream : " + response);
-		res.send(JSON.stringify(response));
-
-	})
-
-	/*
-	var bikes = [];
-	var userid = req.query.id;
-	console.log(userid);
-	User.findById(userid, function(err,user){
-
-		if(user){
-			console.log('found user');
-			var bikerefs = user.bikes;
-			if (bikerefs.length > 0){
-				lupus(0, bikerefs.length, function(n){
-						Bike.findById(bikerefs[n], function(err, bike){
-						if (err)
-							res.send(err);
-						bikes.push(bike);
-
-						});
-					}, function(){
-					
-							res.json(bikes);
-						
-					});
-			}else{
-					res.json("message", "no bikes found for user");
-			}
-		}else{
-
-			res.json("message", "not a valid user");
-
-		}
-	});
-*/
+			});
+		},
+		function(){
+			res.send(401);
+		});
 
 };
 
 
 router.createBikeByUser = function(req,res){
 
-		console.log("trying to create a bike");
-		var json = JSON.stringify(req.body)
-		nc.request('bike.create', json, function(response){
 
-			console.log("got a response in msg stream: " + response);
-				res.send({"message": "bike added"});
-		});
-
-
-	/*
-	console.log("creating bike");
-	var bike = new Bike();
-	bike.nickname = req.body.nickname;
-	bike.make = req.body.make;
-	bike.model = req.body.model;
-	bike.save(function(err){
-
-			console.log('getting user id');
-			var userid = req.query.id;
-			User.findById(userid, function(err, user){
+		var sessionkey = req.get("XAuth");
+		console.log("Session key : " + sessionkey);
+		authenticate.validateSession(sessionkey,
+			function(username){
+					
+				console.log("trying to create a bike");
 				
-				if(user){
+				nc.request('user.read.one', username, function(response){
 
-					console.log('found user');
-					user.bikes.push(bike.id);
-					user.save(function(err){
+					if(response=="")	
+						res.send(400);
+				});
 
-						if(err)
-							res.send(err);
-						res.json(bike);
+				var obj = req.body;
+				obj.username = username;
+				nc.request('bike.create', JSON.stringify(obj), function(response){
 
-					});
-
-				}else{
-
-					res.json({"message": "no user found"});
-				}
-
+					console.log("got a response in msg stream: " + response);
+					res.send(response);
+				});
+			},
+			function(){
+				res.send(401);
 			});
-
-		});
-*/
-
 
 };
 
-
+/*
 router.findAllBikes = function(req, res){
 
 	Bike.find(function(err, bikes){
@@ -136,5 +103,6 @@ router.findAllBikes = function(req, res){
 		});
 
 };
+*/
 
 module.exports = router;

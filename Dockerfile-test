@@ -4,4 +4,4 @@ ADD src /src
 RUN cd /src; npm install
 
 WORKDIR /src/apitest
-ENTRYPOINT ['../node_modules/mocha/bin/mocha']
+RUN ../node_modules/mocha/bin/_mocha
