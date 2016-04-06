@@ -54,6 +54,27 @@ router.findFriendsBySearch = function(req, res){
 
 }
 
+router.deleteFriendship = function(req, res){
+
+
+	var sessionkey = req.get("XAuth");
+	console.log("Session key : " + sessionkey);
+	authenticate.validateSession(sessionkey,
+		function(username){
+			console.log(JSON.stringify(req.params));
+			nc.request('friendship.delete', JSON.stringify(req.params), function(response){
+				console.log("got a respons in msg stream : " + response);
+				res.send(response);
+
+			});
+		},
+		function(){
+			res.send(401);
+		});
+
+
+}
+
 router.findFriendShipsByUser = function(req, res){
 	
 		var sessionkey = req.get("XAuth");
@@ -67,7 +88,7 @@ router.findFriendShipsByUser = function(req, res){
 				
 				if(obj.hasOwnProperty('username')){
 					var query = {};
-					query.username = "Lau";
+					query.username = obj.username;
 					
 					console.log("searching by username");
 					nc.request('friendship.find.by.username',  JSON.stringify(query) , function(response){
@@ -81,10 +102,19 @@ router.findFriendShipsByUser = function(req, res){
 					});
 				}
 				else if(obj.hasOwnProperty('location')){
+					var query = {};
+					query.location = obj.location;
+
+					console.log("searching by location");
+					nc.request('friendship.find.by.location',  JSON.stringify(query) , function(response){
+						
+						if(response.length==0)
+							res.send(400);
+						else
+							res.send(response);
 
 
-					console.log("searching by location - needs to be written");
-					res.send(404);
+					});
 
 				}
 
@@ -129,10 +159,7 @@ router.createFriendship = function(req, res){
 			var obj = req.body;
 			obj.user_name= req.body.user_name;
 			obj.friend_name = req.body.friend_name;
-			var d = new Date();
-			var currentdate = d.toLocaleString();
-			obj.timestamp = currentdate;
-
+			console.log(JSON.stringify(obj));
 			nc.request('friendship.create', JSON.stringify(obj), function(response){
 				if(response)
 					res.send(200);

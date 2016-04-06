@@ -10,6 +10,28 @@ console.log("Connected to " + nc.currentServer);
 var authenticate = require('../utility');
 
 
+router.updateActivity = function(req, res){
+
+	var sessionkey = req.get("XAuth");
+
+	authenticate.validateSession(sessionkey,
+		function(username){
+
+			nc.request('activity.update', JSON.stringify(req.body), function(response){
+
+				res.send(response);
+
+			});
+
+
+
+		}, function(){
+			res.send(401);
+		});
+
+
+
+}
 
 router.deleteActivity = function(req, res){
 

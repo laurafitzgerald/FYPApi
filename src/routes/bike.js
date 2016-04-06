@@ -61,6 +61,45 @@ router.findBikeByUser = function(req, res){
 
 };
 
+router.findBikeBySerial = function(req, res){
+
+	var sessionkey = req.get("XAuth");
+	console.log("Session key : " + sessionkey);
+	authenticate.validateSession(sessionkey,
+		function(username){
+			console.log("read by serial number")
+			nc.request('bike.read.by.serial_number', JSON.stringify(req.params), function(response){
+				console.log("got a response in msg stream : " + response);
+				res.send(response);
+
+			});
+		},
+		function(){
+			res.send(401);
+		});
+
+
+}
+
+router.deleteBike = function(req, res){
+	
+	var sessionkey = req.get("XAuth");
+	console.log("Session key : " + sessionkey);
+	authenticate.validateSession(sessionkey,
+		function(username){
+			console.log(JSON.stringify(req.params));
+			nc.request('bike.delete', JSON.stringify(req.params), function(response){
+				console.log("got a respons in msg stream : " + response);
+				res.send(response);
+
+			});
+		},
+		function(){
+			res.send(401);
+		});
+
+
+}
 
 router.createBikeByUser = function(req,res){
 
@@ -91,6 +130,8 @@ router.createBikeByUser = function(req,res){
 			});
 
 };
+
+
 
 /*
 router.findAllBikes = function(req, res){
