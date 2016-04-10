@@ -65,7 +65,13 @@ router.findActivitiesByUser = function(req, res){
 
 	authenticate.validateSession(sessionkey,
 		function(username){
-			nc.request('activity.read.byuser', username, function(response){
+
+			console.log(req.params);
+
+			console.log(req.body);
+			console.log(req.query);
+			nc.request('activity.read.byuser', req.params.username, function(response){
+				console.log(response);
 				res.send(response);
 			});
 		},

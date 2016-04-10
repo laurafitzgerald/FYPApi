@@ -9,6 +9,29 @@ console.log("Connected to " + nc.currentServer);
 
 var authenticate = require('../utility');
 
+router.deleteReport = function(req, res){
+
+var sessionkey = req.get("XAuth");
+	console.log("Session key : " + sessionkey);
+
+	authenticate.validateSession(sessionkey,
+		function(username){
+			nc.request('report.delete', JSON.stringify(req.params.id), function(response){
+
+				if(!response)
+					res.send(400);
+				else
+					res.send(response);
+
+			});
+
+	},
+		function(){
+			res.send(401);
+		});
+
+}
+
 
 router.updateReport = function(req, res){
 

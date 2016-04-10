@@ -73,6 +73,7 @@ app.put('/reports/:id' , reportsroute.updateReport);
 app.get('/reports', reportsroute.findReports);
 app.post('/reports', reportsroute.createReport);
 app.get('/reports/:id', reportsroute.findReportByID);
+app.delete('/reports/:id', reportsroute.deleteReport);
 
 
 router.get('/', function (req, res) {
