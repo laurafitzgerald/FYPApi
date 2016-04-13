@@ -10,10 +10,7 @@ var PORT = process.env.PORT || 8000;
 var User = require('./models/user');
 var Bike = require('./models/bike');
 var router = express.Router();
-
-var mongoose = require('mongoose');
-mongoose.connect('mongodb://127.0.0.1:27017/bikes');
-
+	
 var usersroute = require('./routes/user');
 var bikesroute = require('./routes/bike');
 var friendshipsroute = require('./routes/friendship');
