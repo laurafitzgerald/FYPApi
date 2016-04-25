@@ -1,7 +1,8 @@
 FROM node
 
 ADD src /src
-RUN cd /src; npm install
+ADD package.json /package.json
+RUN npm install
 
 WORKDIR /src/apitest
 RUN ../node_modules/mocha/bin/_mocha

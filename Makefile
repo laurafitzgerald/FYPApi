@@ -1,18 +1,17 @@
 PASS=$(shell echo $$LAURADOCKERPASSWORD)
 
 clean: 
-	docker rmi fyp/apitest; docker rmi fyp/api
+	docker rmi laurafitz/apitest; docker rmi laurafitz/api
 
 build-test:
-	docker build -f Dockerfile-test -t fyp/apitest .
+	docker build -f Dockerfile-test -t laurafitz/apitest .
 
 test: build-test
-	docker run --rm -v $(shell pwd)/src:/api fyp/apitest
+	docker run --rm -v $(shell pwd)/src:/api laurafitz/apitest
 
 build:
-	docker build -t fyp/api .
+	docker build -t laurafitz/api .
 
 release: build
-	docker login -e laurafitzgeraldsemail@gmail.com -u laura -p $(PASS)  
-	docker-laura.ammeon.com:80 && docker tag -f fyp/api 
-	docker-laura.ammeon.com:80/fyp/api && docker push docker-laura.ammeon.com:80/fyp/api
+	docker push laurafitz/api
+	

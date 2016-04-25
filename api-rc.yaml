@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  labels:
+    name: api
+  name: api
+spec:
+  replicas: 1
+  selector:
+    name: api
+  template:
+    metadata:
+      labels:
+        name: api
+      name: api
+    spec:
+      containers:
+        - image: laurafitz/api:latest
+          name: api
+          env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          ports:
+          - containerPort: 8000
+            hostPort: 31925
+            name: client
+            protocol: TCP
+
