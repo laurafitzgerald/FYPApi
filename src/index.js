@@ -7,8 +7,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 // Constants
 var PORT = process.env.PORT || 8000;
-var User = require('./models/user');
-var Bike = require('./models/bike');
+
 var router = express.Router();
 	
 var usersroute = require('./routes/user');
