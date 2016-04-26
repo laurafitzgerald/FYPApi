@@ -215,6 +215,11 @@ router.findReports = function(req, res){
 
 			}
 
+			nc.request('report.read.all', function(response){
+				
+				res.send(response)
+			})
+
 		},
 		function(){
 			res.send(401);
